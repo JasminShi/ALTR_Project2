@@ -4,19 +4,22 @@ using UnityEngine;
 
 public class ColorControllerRed : MonoBehaviour
 {
-    // Start is called before the first frame update
     //MeshRenderer meshRenderer;
-    private Color emissionColor;
+    private Color tangramEmissionColor;
+    private Color doorEmissionColor;
+
+    //define the material for tangram and door
+    public Material RedTangramMaterial;
+    public Material RedDoorMaterial;
+
     public float intensity;
-    public Material material;
 
     //get required components
     private void Awake()
-    {
-        //get the mesh renderer
-        //meshRenderer = GetComponent<MeshRenderer>();
+    {     
         //get the emission color
-        emissionColor = material.GetColor("_EmissionColor");
+        tangramEmissionColor = RedTangramMaterial.GetColor("_EmissionColor");
+        doorEmissionColor = RedDoorMaterial.GetColor("_EmissionColor");
     }
 
     public void Flash()
@@ -30,10 +33,11 @@ public class ColorControllerRed : MonoBehaviour
         //let it run infinitely
         while (true)
         {
-            // Enables emission for the material, and make the material use
-            // realtime emission
-            material.EnableKeyword("_EMISSION");
-            material.SetColor("_EmissionColor", Color.red*Mathf.PingPong(Time.time, intensity));
+            // Enables tangram and door material
+            RedTangramMaterial.EnableKeyword("_EMISSION");
+            RedDoorMaterial.EnableKeyword("_EMISSION");
+            RedTangramMaterial.SetColor("_EmissionColor", Color.red * Mathf.PingPong(Time.time, intensity));
+            RedDoorMaterial.SetColor("_EmissionColor", Color.red*Mathf.PingPong(Time.time, intensity));
             yield return null;  //the above expression called every frame (similar to creating a background void Update()
         }
     }
@@ -42,7 +46,18 @@ public class ColorControllerRed : MonoBehaviour
     {
         StopAllCoroutines();
         //set intensity of the emission color to a value
-        intensity = 0;
+        //intensity = 0;
+
+        //disable emission color
+        RedTangramMaterial.DisableKeyword("_EMISSION");
+        RedDoorMaterial.DisableKeyword("_EMISSION");
+    }
+
+    public void KeepEmitting()
+    {
+        //make the tangram keep emitting color
+        RedTangramMaterial.EnableKeyword("_EMISSION");
+        RedTangramMaterial.SetColor("_EmissionColor", Color.red * intensity);
     }
 
 }

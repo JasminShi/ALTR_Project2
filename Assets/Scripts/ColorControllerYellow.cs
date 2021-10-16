@@ -6,9 +6,15 @@ public class ColorControllerYellow : MonoBehaviour
 {
     // Start is called before the first frame update
     //MeshRenderer meshRenderer;
-    private Color emissionColor;
+    private Color tangramEmissionColor;
+    private Color doorEmissionColor;
+
     public float intensity;
-    public Material material;
+
+    //define the material for tangram and door
+    public Material YellowTangramMaterial;
+    public Material YellowDoorMaterial;
+
 
     //get required components
     private void Awake()
@@ -16,7 +22,8 @@ public class ColorControllerYellow : MonoBehaviour
         //get the mesh renderer
         //meshRenderer = GetComponent<MeshRenderer>();
         //get the emission color
-        emissionColor = material.GetColor("_EmissionColor");
+        tangramEmissionColor = YellowTangramMaterial.GetColor("_EmissionColor");
+        doorEmissionColor = YellowDoorMaterial.GetColor("_EmissionColor");
     }
 
     public void Flash()
@@ -32,8 +39,10 @@ public class ColorControllerYellow : MonoBehaviour
         {
             // Enables emission for the material, and make the material use
             // realtime emission
-            material.EnableKeyword("_EMISSION");
-            material.SetColor("_EmissionColor", Color.yellow*Mathf.PingPong(Time.time, intensity));
+            YellowTangramMaterial.EnableKeyword("_EMISSION");
+            YellowDoorMaterial.EnableKeyword("_EMISSION");
+            YellowTangramMaterial.SetColor("_EmissionColor", Color.yellow * Mathf.PingPong(Time.time, intensity));
+            YellowDoorMaterial.SetColor("_EmissionColor", Color.yellow * Mathf.PingPong(Time.time, intensity));
             yield return null;  //the above expression called every frame (similar to creating a background void Update()
         }
     }
@@ -41,8 +50,16 @@ public class ColorControllerYellow : MonoBehaviour
     public void StopFlashing()
     {
         StopAllCoroutines();
-        //set intensity of the emission color to a value
-        intensity = 0;
+        //disable emission color
+        YellowTangramMaterial.DisableKeyword("_EMISSION");
+        YellowDoorMaterial.DisableKeyword("_EMISSION");
     }
 
+
+    public void KeepEmitting()
+    {
+        //make the tangram keep emitting color
+        YellowTangramMaterial.EnableKeyword("_EMISSION");
+        YellowTangramMaterial.SetColor("_EmissionColor", Color.yellow * intensity);
+    }
 }

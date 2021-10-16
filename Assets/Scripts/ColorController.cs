@@ -39,7 +39,7 @@ public class ColorController : MonoBehaviour
             material.EnableKeyword("_EMISSION");
             //meshRenderer.material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
             material.SetColor("_EmissionColor", emissionColor*Mathf.PingPong(Time.time, intensity));
-            //Debug.Log("Start Flashing!");
+            Debug.Log(emissionColor);
             yield return null;  //the above expression called every frame (similar to creating a background void Update()
         }
     }
@@ -48,8 +48,8 @@ public class ColorController : MonoBehaviour
     public void StopFlashing()
     {
         StopAllCoroutines();
-        //set intensity of the emission color to a value
-        intensity = 0;
+        //disable emission color
+        material.DisableKeyword("_EMISSION");
     }
 
 

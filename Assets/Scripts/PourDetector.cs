@@ -5,13 +5,15 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class PourDetector : MonoBehaviour
 {
+    //variables for water pouring interaction
     ParticleSystem waterDropSystem;
-    public int pourThreshold = 60;
-    //public Transform origin = null;
-    //public GameObject waterStream = null;
-    
-    private bool isPouring = false;
-    //private Stream currentStream = null;
+    public int pourThreshold = 60;   
+    public bool isPouring = false;
+
+    //variables for water pouring sound
+    public AudioSource waterPouringSource;
+    public AudioClip waterPouringClip;
+    public float volume;
 
     private void Awake()
     {
@@ -40,14 +42,14 @@ public class PourDetector : MonoBehaviour
 
     private void StartPour()
     {
-        Debug.Log("Start");
         waterDropSystem.Play();
+        waterPouringSource.PlayOneShot(waterPouringClip, volume);
     }
 
     private void EndPour()
-    {
-        Debug.Log("End");
+    {      
         waterDropSystem.Stop();
+        waterPouringSource.Stop();
     }
 
   

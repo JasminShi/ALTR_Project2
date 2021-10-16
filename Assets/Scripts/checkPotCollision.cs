@@ -13,6 +13,7 @@ public class checkPotCollision : MonoBehaviour
         if (other.gameObject.CompareTag("Righthand"))
         {
             potPicked = true;
+            Debug.Log("potPicked");
         }
     }
 
@@ -21,6 +22,7 @@ public class checkPotCollision : MonoBehaviour
         if (collision.gameObject.CompareTag("Plantbox"))
         {
             potOut = true;
+            Debug.Log("potOut");
         }
     }
 }

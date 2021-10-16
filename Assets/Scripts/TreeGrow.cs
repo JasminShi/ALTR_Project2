@@ -19,6 +19,7 @@ public class TreeGrow : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Plantbox"))
         {
+            Debug.Log("potPlanting is true");
             potPlanting = true;
         }
     }
@@ -26,12 +27,13 @@ public class TreeGrow : MonoBehaviour
     private void Update()
     {
         isWatering = waterPlanting.isDropping;
-
+       
         if (potPlanting == true && isWatering == true && scaleStart == true)
         {
             treeGrowing.StartScaling();
             //make sure it only grow once
             scaleStart = false;
+
         }
     }
 

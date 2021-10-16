@@ -5,7 +5,6 @@ using UnityEngine;
 public class DoorController : MonoBehaviour
 {
     //check each action's completion status
-    private bool step1Start = false;
     private bool step1Complete = false;
     private bool step2Complete = false;
     private bool step3Complete = false;
@@ -13,10 +12,10 @@ public class DoorController : MonoBehaviour
 
     //get script from the light objects
     //https://www.codegrepper.com/code-examples/csharp/call+script+in+another+script+unity
-    public ColorController light1Script;
-    public ColorController light2Script;
-    public ColorController light3Script;
-    public ColorController light4Script;
+    //public ColorController light1Script;
+    //public ColorController light2Script;
+    //public ColorController light3Script;
+    //public ColorController light4Script;
 
     //color scripts for the cabinet doors
     public ColorControllerRed color1Script;
@@ -30,8 +29,17 @@ public class DoorController : MonoBehaviour
     public checkSeedCollision seedPot;
     public checkWaterCollision waterPot;
 
+    public OnceOnceAudio letter1Audio;
     public OpenDoor doorTrigger;
 
+    //puzzle complete sound
+    public AudioClip puzzleCompleteClip;
+    public AudioSource puzzleCompleteSource;
+    public float Volume;
+
+    Coroutine timeout;
+    private bool doorOpen = false;
+    private bool doorSound = false;
 
     //need to define the bool before assigning value to it
     //pick the pot first
@@ -49,16 +57,17 @@ public class DoorController : MonoBehaviour
     //last water bottle
     public bool waterPick;
     public bool waterExit;
-  
+
+    public bool redLightStart;
 
 
     private void Start()
     {
-        //step1 automatically starts(light flashing and check action1)
-        Step1Start();
-        //get bool from checkCollision script
-        //checkCollision checkCol = GameObject.Find("waterBottle").GetComponent<checkCollision>();
-        //waterBottle.GetComponent<checkCollision>();      
+        //disable all emission colors at first
+        color1Script.StopFlashing();
+        color2Script.StopFlashing();
+        color3Script.StopFlashing();
+        color4Script.StopFlashing();     
     }
 
     private void Update()
@@ -76,19 +85,21 @@ public class DoorController : MonoBehaviour
         waterPick = waterPot.waterPicked;
         waterExit = waterPot.waterOut;
 
-        if(step1Start == true)
+        redLightStart = letter1Audio.startRed;
+        //Debug.Log(redLightStart);
+
+        if(redLightStart)
         {
+            color1Script.Flash();
             checkAction1();
         }
 
         if (step1Complete)
         {
             //make light1 constant and make light2 flash
-            light1Script.StopFlashing();
             color1Script.StopFlashing();
-            light2Script.Flash();
             color2Script.Flash();
-            Debug.Log("step1complete!");
+            //Debug.Log("step1complete!");
             //check action2
             checkAction2();
             //make sure it only run once
@@ -98,11 +109,9 @@ public class DoorController : MonoBehaviour
         if (step2Complete)
         {
             //make light2 constant and make light3 flash
-            light2Script.StopFlashing();
             color2Script.StopFlashing();
-            light3Script.Flash();
             color3Script.Flash();
-            Debug.Log("step2complete!");
+            //Debug.Log("step2complete!");
             //check action3
             checkAction3();
             step2Complete = false;
@@ -111,40 +120,25 @@ public class DoorController : MonoBehaviour
         if (step3Complete)
         {
             //make light3 constant and make light4 flash
-            light3Script.StopFlashing();
             color3Script.StopFlashing();
-            light4Script.Flash();
             color4Script.Flash();
-            Debug.Log("step3complete!");
-            //check action4
+            //Debug.Log("step3complete!");
             checkAction4();
-            step3Complete = true;
+            step3Complete = false; ;
         }
 
         if (step4Complete)
         {
             //make light3 constant and make light4 flash
-            light4Script.StopFlashing();
             color4Script.StopFlashing();
      
-            Debug.Log("step4complete! Now go out to grow trees");
+            //Debug.Log("step4complete! Now go out to grow trees");
             //open the door
             DoorOpen();
-            step4Complete = true;
+            step4Complete = false;
         }
 
 
-    }
-
-    //called at the beginning by void start()
-    private void Step1Start()
-    {
-        //at the beginning
-        //light flashes at start           
-        light1Script.Flash();
-        color1Script.Flash();
-        step1Start = true;
-        //don't call checkAction1 here because it's called once
     }
 
 
@@ -184,7 +178,41 @@ public class DoorController : MonoBehaviour
 
     public void DoorOpen()
     {
-        doorTrigger.StartDoorOpen();
+        //play the puzzle complete audio to indicate completion and trigger door open sound
+        //first, trigger the sound
+
+        //open the door after the puzzle complete indication sound
+        //start coroutine
+        if(doorOpen == false && doorSound == false)
+        {
+            puzzleCompleteSource.PlayOneShot(puzzleCompleteClip, Volume);
+            doorSound = true;
+            timeout = StartCoroutine(TimeOut());
+        }
+
+        IEnumerator TimeOut()
+        {
+            yield return new WaitForSeconds(1);
+            doorTrigger.StartDoorOpen();
+            doorOpen = true;
+        }
+
+        ClearTimeOut();
+
+
+        //make the tangram emitting color at a certain intensity
+        color1Script.KeepEmitting();
+        color2Script.KeepEmitting();
+        color3Script.KeepEmitting();
+        color4Script.KeepEmitting();
+    }
+
+    private void ClearTimeOut()
+    {
+        if (doorOpen == true)
+        {
+            StopCoroutine(timeout);
+        }
     }
 
 
